@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
 import { GHOSTTY_ASSET_PATHS } from "@openclaw/libterminal/node";
@@ -26,10 +27,10 @@ const distDocs = new URL("../dist/docs/", import.meta.url);
 const appOrigin = "https://crabfleet.openclaw.ai";
 
 await run(process.execPath, [
-  new URL("../node_modules/vite/bin/vite.js", import.meta.url).pathname,
+  fileURLToPath(new URL("../node_modules/vite/bin/vite.js", import.meta.url)),
   "build",
   "--config",
-  new URL("../vite.config.mjs", import.meta.url).pathname,
+  fileURLToPath(new URL("../vite.config.mjs", import.meta.url)),
 ]);
 
 const [appHtmlSource, rawSpecMarkdown, rawSpecV2Markdown, logoBytes, ogImageBytes, lucideIconJson] =
