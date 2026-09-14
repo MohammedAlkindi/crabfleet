@@ -16,13 +16,15 @@ const productName = "Crabfleet";
 const productTagline = "Your computers, within reach.";
 const productDescription =
   "Crabfleet is a native VNC app for private desktop sharing, with Mac viewing and Linux and Windows hosts.";
-const installCommand = "open /Applications/Crabfleet.app";
 const codePlaceholder = String.fromCharCode(0);
 const codePlaceholderPattern = new RegExp(`${codePlaceholder}(\\d+)${codePlaceholder}`, "g");
 
 const sections = [
-  ["Start", ["index.md", "quickstart.md", "architecture.md"]],
-  ["Desktops", ["macos-native-client.md", "linux-connector.md", "linux-greeter.md"]],
+  ["Start", ["index.md", "quickstart.md", "connections.md", "architecture.md"]],
+  [
+    "Desktops",
+    ["macos-native-client.md", "linux-connector.md", "linux-greeter.md", "windows-connector.md"],
+  ],
   ["Reference", ["admin.md", "api.md", "screen-recording-indicator.md"]],
 ];
 
@@ -91,14 +93,10 @@ function llmsTxt() {
   const name = typeof productName !== "undefined" ? productName : path.basename(root);
   const description =
     typeof productDescription !== "undefined" ? productDescription : `${name} documentation index.`;
-  const install = docsInstallHint();
   const docPages = docsLlmsPages().map(
     (page) => `- ${page.title}: ${pageUrl(origin, page.outRel)}`,
   );
   const lines = [`# ${name}`, "", description, "", "Canonical documentation:", ...docPages];
-  if (install) {
-    lines.push("", "Install:", `- ${install}`);
-  }
   if (source) {
     lines.push("", `Source: ${source}`);
   }
@@ -132,15 +130,6 @@ function docsSourceUrl() {
   if (typeof repoUrl !== "undefined") return repoUrl;
   if (typeof repoEditBase !== "undefined")
     return repoEditBase.replace(/\/edit\/main\/docs\/?$/, "");
-  return "";
-}
-
-function docsInstallHint() {
-  if (typeof installCommand !== "undefined") return installCommand;
-  if (typeof installLine !== "undefined") return installLine;
-  if (typeof installCmd !== "undefined") return installCmd;
-  if (typeof installSnippet !== "undefined") return installSnippet;
-  if (typeof brewInstall !== "undefined") return brewInstall;
   return "";
 }
 
@@ -216,6 +205,7 @@ function outPath(rel, frontmatter = {}) {
   if (frontmatter.permalink) {
     const permalink = normalizePermalink(frontmatter.permalink);
     if (permalink === "/") return "index.html";
+    if (permalink.endsWith(".html")) return permalink.slice(1);
     return `${permalink.slice(1)}/index.html`;
   }
   if (rel === "index.md") return "index.html";
@@ -530,9 +520,7 @@ function layout({ page, html, toc, prev, next, sectionName }) {
     ["meta", "property", "og:description", "content", description],
     ["meta", "property", "og:url", "content", canonicalUrl],
     ["meta", "property", "og:image", "content", socialImage],
-    ["meta", "property", "og:image:width", "content", "1200"],
-    ["meta", "property", "og:image:height", "content", "630"],
-    ["meta", "name", "twitter:card", "content", "summary_large_image"],
+    ["meta", "name", "twitter:card", "content", "summary"],
     ["meta", "name", "twitter:title", "content", titleSuffix],
     ["meta", "name", "twitter:description", "content", description],
     ["meta", "name", "twitter:image", "content", socialImage],
